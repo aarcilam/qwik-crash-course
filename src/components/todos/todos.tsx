@@ -1,8 +1,8 @@
-import { $, component$, useContext, useSignal } from "@builder.io/qwik";
+import { $, component$, useContext } from "@builder.io/qwik";
 import { TodoList } from "./todoList";
 import { TodoContext } from "~/context";
-import { routeLoader$, z } from "@builder.io/qwik-city";
-import { InitialValues, SubmitHandler, formAction$, useForm, zodForm$ } from "@modular-forms/qwik";
+import { z } from "@builder.io/qwik-city";
+import { SubmitHandler, formAction$, useForm, zodForm$ } from "@modular-forms/qwik";
 import { useFormLoader } from "~/routes";
 
 const addTodoSchema = z.object({
@@ -25,7 +25,6 @@ export const Todos = component$(() => {
     validate: zodForm$(addTodoSchema),
   });
 
-  const state = useSignal("");
   const todoStore = useContext(TodoContext);
 
   const handleAddTodo: SubmitHandler<TodoForm> = $((values, event) => {
@@ -36,38 +35,29 @@ export const Todos = component$(() => {
   return (
     <div>
       <Form onSubmit$={handleAddTodo}>
-        <Field name="name">
-          {(field, props) => (
-            <div>
+          <Field name="name">
+            {(field, props) => (
+              <div>                  
+              <div class="flex">
+                <div class="">
+                    <input 
+                      class="border border-gray-400 py-2 px-4 rounded-l" 
+                      {...props} 
+                      type="text" 
+                      value={field.value} 
+                    />
+                </div>
                 <input 
-                  class="border border-gray-400 py-2 px-4 rounded-l" 
-                  {...props} 
-                  type="text" 
-                  value={field.value} 
+                  class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" 
+                  type="submit" 
+                  value='Haz clic aquí' 
                 />
-                {field.error && <div>{field.error}</div>}
               </div>
-          )}
-        </Field>
-        <input 
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" 
-          type="submit" 
-          value='Haz clic aquí' 
-        />
+              {field.error && <div>{field.error}</div>}
+              </div>
+            )}
+          </Field>
       </Form>
-      {/* <input
-        type="text"
-        class="border border-gray-400 py-2 px-4 rounded-l"
-        value={state.value}
-        onInput$={(ev: any) => (state.value = ev?.target?.value)}
-        placeholder="Name"
-      />
-      <button
-        onClick$={() => handleAddTodo()}
-        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-      >
-        Haz clic aquí
-      </button> */}
       <div class="notebook">
         <div class="notebook-header">
           <h2 class="notebook-title">Mi Libreta de Notas</h2>
