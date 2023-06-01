@@ -4,11 +4,16 @@ import {
   useStore,
   useVisibleTask$,
 } from "@builder.io/qwik";
-import { DocumentHead, server$ } from "@builder.io/qwik-city";
+import { DocumentHead, routeLoader$, server$ } from "@builder.io/qwik-city";
+import { InitialValues } from "@modular-forms/qwik";
 import { Counter } from "~/components/router-head/counter/counter";
 import { Store } from "~/components/todos/interfaces";
-import { Todos } from "~/components/todos/todos";
+import { TodoForm, Todos } from "~/components/todos/todos";
 // import { TodoContext } from "~/context/context";
+
+export const useFormLoader = routeLoader$<InitialValues<TodoForm>>(() => ({
+  name: ''
+}));
 
 export default component$(() => {
   // useContextProvider(TodoContext, store);

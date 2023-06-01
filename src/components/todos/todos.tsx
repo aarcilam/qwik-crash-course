@@ -1,25 +1,61 @@
 import { $, component$, useContext, useSignal } from "@builder.io/qwik";
 import { TodoList } from "./todoList";
 import { TodoContext } from "~/context";
+import { routeLoader$, z } from "@builder.io/qwik-city";
+import { InitialValues, SubmitHandler, formAction$, useForm, zodForm$ } from "@modular-forms/qwik";
+import { useFormLoader } from "~/routes";
+
+const addTodoSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Please enter something.')
+});
+ 
+export type TodoForm = z.infer<typeof addTodoSchema>;
+
+export const useFormAction = formAction$<TodoForm>((values) => {
+  // Runs on server
+  console.log(values);
+}, zodForm$(addTodoSchema));
 
 export const Todos = component$(() => {
-  // TODO UN ESTADO PARA GUARDAR LAS TODOS
+  const [todoForm, { Form, Field }] = useForm<TodoForm>({
+    loader: useFormLoader(),
+    action: useFormAction(), // solo server
+    validate: zodForm$(addTodoSchema),
+  });
+
   const state = useSignal("");
   const todoStore = useContext(TodoContext);
-  // TODO INTERFACE UNA PARA STORE Y UNA TODO
-  // TODO INPUT + BOTON QUE ME CREE TODO EN UNA VARIABLE EN STADO
-  // TODO MOSTRAR EL ARRAY
-  // TODO COMPONENTE PARA CREAR EL TODO Y QUE RECIBA UNA PROP
-  // TODO MIRES TAILWIND COMO LE DAS STYLES A ESTO , COMO SI FUERA UNA LIBRETA
-  // TODO CONTEXTO QUE PASE LOS TODOS index
 
-  const handleAddTodo = $(() => {
-    todoStore.todos?.push({ name: state.value });
+  const handleAddTodo: SubmitHandler<TodoForm> = $((values, event) => {
+    // Runs on client
+    todoStore.todos?.push({ name: values.name });
   });
 
   return (
     <div>
-      <input
+      <Form onSubmit$={handleAddTodo}>
+        <Field name="name">
+          {(field, props) => (
+            <div>
+                <input 
+                  class="border border-gray-400 py-2 px-4 rounded-l" 
+                  {...props} 
+                  type="text" 
+                  value={field.value} 
+                />
+                {field.error && <div>{field.error}</div>}
+              </div>
+          )}
+        </Field>
+        <input 
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" 
+          type="submit" 
+          value='Haz clic aquí' 
+        />
+      </Form>
+      {/* <input
         type="text"
         class="border border-gray-400 py-2 px-4 rounded-l"
         value={state.value}
@@ -31,7 +67,7 @@ export const Todos = component$(() => {
         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
       >
         Haz clic aquí
-      </button>
+      </button> */}
       <div class="notebook">
         <div class="notebook-header">
           <h2 class="notebook-title">Mi Libreta de Notas</h2>
